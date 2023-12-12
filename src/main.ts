@@ -1,6 +1,22 @@
+import {enableProdMode, importProvidersFrom, Injector} from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
-import { appConfig } from './app/app.config';
 import { AppComponent } from './app/app.component';
+import { HttpClientModule } from '@angular/common/http';
+import {environment} from "./environments/environment";
+import {AppRoutingModule} from "./app/app-routing.module";
+import {initAuthGuard} from "./app/guard/auth.guard";
 
-bootstrapApplication(AppComponent, appConfig)
-  .catch((err) => console.error(err));
+if (environment.production) {
+  enableProdMode();
+}
+
+bootstrapApplication(AppComponent, {
+  providers: [
+    importProvidersFrom(AppRoutingModule),
+    importProvidersFrom(HttpClientModule),
+    // ... other global providers if any
+  ]
+}).then(appRef => {
+  const injector: Injector = appRef.injector;
+  initAuthGuard(injector); // Initialize the authGuard with the injector
+}).catch(err => console.error(err));
